@@ -1,10 +1,15 @@
+from typing import Optional, Dict, Any, List
+from requests import \
+    Request, \
+    Session, \
+    Response, \
+    request, \
+    exceptions
+
 import hmac
-import hashlib
-import requests
 import time
-import base64
-import random
-import string
+
+
 
 BASE_URL = 'https://app.primebit.com/api/v1'
 
@@ -16,25 +21,30 @@ class PrimebitPublic():
         self.type = type
         self.base_url = BASE_URL
 
-    def public_request(self, method, api_url, params=None):
+    def _request(self, method: str, api_url: str, params=None):
         '''Public Requests'''
         r_url = self.base_url + api_url
         print(r_url)
         try:
-            r = requests.request(method, r_url, params=params)
+            r = request(method, r_url, params=params)
             print(r)
             r.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except exceptions.HTTPError as err:
             print(err)
         if r.status_code == 200:
             return r.json()
+
+    def _get(self, api_url: str, params: Optional[Dict[str, Any]] = None):
+        return self._request('GET', api_url, params=params)
 
     def _assetsDetails(self):
         '''
 
         :return:
         '''
-        return self.public_request('GET', '/trading/assets')
+        return self._get(
+            '/trading/assets'
+        )
 
     def assets(self):
         '''
@@ -46,7 +56,7 @@ class PrimebitPublic():
 
         return [d for d in self._assetsDetails()]
 
-    def symbols(self):
+    def getsymbols(self):
         '''
         Get symbols
         /trading/market_data/symbol/{type}
@@ -54,7 +64,9 @@ class PrimebitPublic():
         :return:
         '''
 
-        return self.public_request('GET', '/trading/market_data/symbol/%s' % (self.type))
+        return self._get(
+            '/trading/market_data/symbol/%s' % (self.type)
+        )
 
     def symbolsDailyStats(self, symbol):
         '''
@@ -64,8 +76,7 @@ class PrimebitPublic():
         :return:
         '''
 
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/symbol/%s/%s/daily_stats' % (self.type, symbol)
         )
 
@@ -76,8 +87,7 @@ class PrimebitPublic():
         :param params:
         :return:
         '''
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/order_book/%s/%s' % (self.type, symbol)
         )
 
@@ -88,14 +98,13 @@ class PrimebitPublic():
         :param params:
         :return:
         '''
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/summary/%s' % (self.type)
         )
 
     def getTicker(self, symbol):
         '''
-        Overview of market data for a symbol tickers
+        Get data for a specific ticker
         /trading/market_data/summary/{type}
         :param params:
         :return:
@@ -110,14 +119,13 @@ class PrimebitPublic():
         :param params:
         :return:
         '''
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/ticker/%s' % (self.type)
         )
 
     def getTickerStat(self, symbol):
         '''
-        24-hour rolling window price change statistics for a market
+        24-hour rolling window price change statistics for a specific pair
         /trading/market_data/summary/{type}
         :param params:
         :return:
@@ -132,8 +140,7 @@ class PrimebitPublic():
         :param params:
         :return:
         '''
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/trades/%s/%s' % (self.type, symbol)
         )
 
@@ -144,77 +151,60 @@ class PrimebitPublic():
         :param params:
         :return:
         '''
-        return self.public_request(
-            'GET',
+        return self._get(
             '/trading/market_data/trades/%s/last/%s' % (self.type, symbol)
         )
 
 
 class PrimebitPrivate():
     def __init__(self, accountID=None, key=None, secret=None):
+        self._session = Session()
+        self._account_ID = accountID
+        self._api_key = key
+        self._api_secret = secret
 
-        self.base_url = BASE_URL
-        self.key = bytes(key, 'utf-8')
-        self.secret = bytes(secret, 'utf-8')
-        self.accountID = bytes(accountID, 'utf-8')
+    def _get(self, path: str, params: Optional[Dict[str, Any]] = None):
+        return self._request('GET', path, params=params)
 
-    def order_link_id(self, stringLength):
-        '''Alphanumeric random string generator'''
-        lettersAndDigits = string.ascii_letters + string.digits
-        return ''.join(random.choice(lettersAndDigits) for i in range(stringLength))
+    def _post(self, path: str, params: Optional[Dict[str, Any]] = None):
+        return self._request('POST', path, json=params)
 
-    def get_signed(self, sig_str):
-        '''Parameter signing using sha512'''
-        sig_str = base64.b64encode(sig_str)
-        signature = base64.b64encode(hmac.new(self.secret, sig_str, digestmod=hashlib.sha256).digest())
-        print(signature)
-        return signature
+    def _delete(self, path: str, params: Optional[Dict[str, Any]] = None):
+        return self._request('DELETE', path, json=params)
 
-    def signed_request(self, method, api_url, params=None):
-        '''Handler for a signed requests'''
+    def _request(self, method: str, path: str, **kwargs):
+        request = Request(method, BASE_URL + path, **kwargs)
+        # print('---------------------------------')
+        # print(method, BASE_URL + path)
 
-        param = ''
-        if params:
-            sort_pay = sorted(params.items())
+        self._sign_request(request)
+        response = self._session.send(request.prepare())
+        # print(response)
+        return self._process_response(response)
 
-            for k in sort_pay:
-                param += '&' + str(k[0]) + '=' + str(k[1])
-            param = param.lstrip('&')
-        timestamp = str(int(time.time() * 1000))
-        full_url = self.base_url + api_url
-
-        if method == 'GET':
-            if param:
-                full_url = full_url + '?' + param
-            sig_str = method + full_url + timestamp
-        elif method == 'POST':
-            sig_str = method + full_url + timestamp + param
-
-        signature = self.get_signed(bytes(sig_str, 'utf-8'))
-
-        headers = {
-            'api-key': self.key,
-            'authorization': signature,
-            'timestamp': timestamp
-
-        }
-        print(headers)
-
+    def _process_response(self, response: Response) -> Any:
         try:
-            print(
-                method,
-                full_url,
-                headers,
-                params
-            )
-            r = requests.request(method, full_url, headers=headers, json=params)
+            data = response.json()
 
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print(err)
-            print(r.text)
-        if r.status_code == 200:
-            return r.json()
+        except ValueError:
+            response.raise_for_status()
+            raise
+
+        return data
+
+
+    def _sign_request(self, request: Request):
+        timestamp = int(time.time())
+        prepared = request.prepare()
+        '''signature components order matters - should be {method}{body}{path}{query}{timestamp}'''
+        signature_payload = f'{prepared.method}{prepared.path_url}{timestamp}'.encode()
+        if prepared.body:
+            signature_payload += prepared.body
+        signature = hmac.new(self._api_secret.encode(), signature_payload, 'sha256').hexdigest()
+        request.headers['api-key'] = self._api_key
+        request.headers['authorization'] = signature
+        request.headers['timestamp'] = str(timestamp)
+        # print(request.headers)
 
     def getAllAccounts(self):
         '''
@@ -225,8 +215,7 @@ class PrimebitPrivate():
         :param params:
         :return:
         '''
-        return self.signed_request(
-            'GET',
+        return self._get(
             '/trading/account'
         )
 
@@ -239,9 +228,8 @@ class PrimebitPrivate():
         :param params:
         :return:
         '''
-        return self.signed_request(
-            'GET',
-            '/trading/account/%s' % (self.accountID)
+        return self._get(
+            '/trading/account/%s' % (self._account_ID)
         )
 
     def getAccountPositions(self):
@@ -253,23 +241,21 @@ class PrimebitPrivate():
         :param params:
         :return:
         '''
-        return self.signed_request(
-            'GET',
-            '/trading/account/%s/position' % (self.accountID)
+        return self._get(
+            '/trading/account/%s/position' % (self._account_ID)
         )
 
     def getPosition(self, symbol):
         '''
         GET
         /trading/account/{account_id}/position/{symbol}
-        Get position
+        Get a particular position
 
         :param params:
         :return:
         '''
-        return self.signed_request(
-            'GET',
-            '/trading/account/%s/position/%s' % (self.accountID, symbol),
+        return self._get(
+            '/trading/account/%s/position/%s' % (self._account_ID, symbol),
         )
 
     def createOrder(self, **params):
@@ -324,12 +310,11 @@ class PrimebitPrivate():
         }
         :return:
         '''
-        return self.signed_request(
-            'POST',
-            '/trading/account/%s/order' % (self.accountID),
+        return self._post(
+            '/trading/account/%s/order' % (self._account_ID),
             **params)
 
-    def marketBuy(self, symbol, volume, comment, stopPrice):
+    def marketBuy(self, symbol: str, volume: str, comment: str, stopPrice: str):
         '''
 
         :param symbol:
@@ -358,14 +343,13 @@ class PrimebitPrivate():
             side='buy',
             type='market',
             volume=str(volume),
-            # price=str(price),
             fill_type="immediate-or-cancel",
             comment=comment,
             stop_price=str(stopPrice)
 
         )
 
-    def marketSell(self, symbol, volume, comment, stopPrice):
+    def marketSell(self, symbol: str, volume: str, comment: str, stopPrice: str):
         '''
 
         :param symbol:
@@ -399,7 +383,7 @@ class PrimebitPrivate():
             stop_price=str(stopPrice)
         )
 
-    def buyLimit(self, symbol, volume, price, comment, stopPrice):
+    def buyLimit(self, symbol: str, volume: str, price: str, comment: str, stopPrice: str):
         '''
 
         :param symbol:
@@ -435,7 +419,7 @@ class PrimebitPrivate():
             stop_price=str(stopPrice)
         )
 
-    def sellLimit(self, symbol, volume, price, comment, stopPrice):
+    def sellLimit(self, symbol: str, volume: str, price: str, comment: str, stopPrice: str):
         '''
 
         :param symbol:
@@ -471,7 +455,7 @@ class PrimebitPrivate():
             stop_price=str(stopPrice)
         )
 
-    def deleteOrder(self, order_id):
+    def deleteOrder(self, order_id: int):
         '''
         DELETE
         Order cancellation
@@ -479,9 +463,8 @@ class PrimebitPrivate():
         :param order_id:
         :return:
         '''
-        return self.signed_request(
-            'DELETE',
-            '/trading/account/%s/order/%s' % (self.accountID, order_id)
+        return self._delete(
+            '/trading/account/%s/order/%s' % (self._account_ID, order_id)
         )
 
     def getAccountOrders(self):
@@ -505,7 +488,13 @@ class PrimebitPrivate():
           }
         ]
         '''
-        return self.signed_request(
+        return self._get(
             'GET',
-            '/trading/account/%s/order' % (self.accountID)
+            '/trading/account/%s/order' % (self._account_ID)
         )
+
+
+
+
+
+
