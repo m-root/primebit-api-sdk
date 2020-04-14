@@ -62,10 +62,9 @@ print(data)
 
 # Get all user accounts
 
-
-Key = 'a857c6bd-6fc2-40bb-967f-4c8e3f66e934'
-Secret = 'XxWb5ilhctIYCsoi7N3Y66Der2fGP8qOuyNuRj0RWiA='
-accountID = '976a8861-0a9f-4a2c-b383-99b8b158b6e4'
+Key = 'bb7b0ee4-77b7-4890-a812-3a40bd31727c'
+Secret = 'WnrKVFL5Dvom/U+1OAZ+bB0QVBET/LNIaFSLYoiw/VY='
+accountID = '418a622b-7b3e-466e-9ee5-b79c7cf09a37'
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 
 data = private.getAllAccounts()
