@@ -1,7 +1,5 @@
 from primebit.primebit import PrimebitPrivate, PrimebitPublic
 
-
-
 public = PrimebitPublic(type='live')
 
 # Details on crypto currencies available on the exchange
@@ -103,14 +101,11 @@ private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 data = private.marketSell(symbol='BTCUSD', volume='0.001', comment='', stopPrice='')
 print(data)
 
-
-
 # Buy Limit for an order
 
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 data = private.buyLimit(symbol='BTCUSD', volume='0.001', price='7000', comment='', stopPrice='')
 print(data)
-
 
 # Sell Limit for an order
 
@@ -118,20 +113,14 @@ private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 data = private.sellLimit(symbol='BTCUSD', volume='0.001', price='7000', comment='', stopPrice='')
 print(data)
 
-
-
 # Cancel current pending orders
 
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 data = private.deleteOrder(order_id=135153)
 print(data)
 
-
-
 # Listing all orders
 
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 data = private.getAccountOrders()
 print(data)
-
-
