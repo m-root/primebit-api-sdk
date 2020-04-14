@@ -6,9 +6,6 @@ Public Orders
 
 Details on crypto currencies available on the exchange
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -19,9 +16,6 @@ Details on crypto currencies available on the exchange
 
 Details on crypto currencies available on the exchange
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -30,9 +24,6 @@ Details on crypto currencies available on the exchange
     print(data)
 
 Get symbols
-
-.. code:: python
-
 
     from primebit import PrimebitPublic
     
@@ -43,9 +34,6 @@ Get symbols
 
 Get symbol daily stats
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -55,9 +43,6 @@ Get symbol daily stats
 
 Get aggregated 32-levels of order book
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -66,9 +51,6 @@ Get aggregated 32-levels of order book
     print(data)
 
 Overview of market data for all tickers
-
-.. code:: python
-
 
     from primebit import PrimebitPublic
     
@@ -81,9 +63,6 @@ Overview of market data for all tickers
 
 Get data for a specific ticker
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -93,9 +72,6 @@ Get data for a specific ticker
 
 
 24-hour rolling window price change statistics for all markets
-
-.. code:: python
-
 
     from primebit import PrimebitPublic
     
@@ -108,9 +84,6 @@ Get data for a specific ticker
 
 24-hour rolling window price change statistics for a specific pair
 
-.. code:: python
-
-
     from primebit import PrimebitPublic
     
     public = PrimebitPublic(type='live')
@@ -119,12 +92,7 @@ Get data for a specific ticker
     print(data)
 
 
-
-
 Trades completed in the last 24 hours for a given market.
-
-.. code:: python
-
 
     from primebit import PrimebitPublic
     
@@ -135,9 +103,6 @@ Trades completed in the last 24 hours for a given market.
 
 
 Trades completed in the last 10 minutes
-    
-.. code:: python
-
 
     from primebit import PrimebitPublic
     
@@ -154,9 +119,6 @@ Private
 
 Get all user accounts
 
-.. code:: python
-
-
     from primebit import PrimebitPrivate
     
     Key = ''
@@ -169,9 +131,6 @@ Get all user accounts
     print(data)
 
 Get account
-    
-.. code:: python
-
 
     from primebit import PrimebitPrivate    
     
@@ -184,9 +143,6 @@ Get account
     print(data)
 
 List account positions
-    
-.. code:: python
-
 
     from primebit import PrimebitPrivate    
     
@@ -200,9 +156,6 @@ List account positions
 
 Get a particular position
 
-.. code:: python
-
-
     from primebit import PrimebitPrivate
     
     Key = ''
@@ -215,8 +168,6 @@ Get a particular position
 
 Buy at market with a market order at current price
 
-.. code:: python
-
     from primebit import PrimebitPrivate
     
     Key = ''
@@ -228,9 +179,6 @@ Buy at market with a market order at current price
     print(data)
 
 Sell at market with a market order at current price
-
-.. code:: python
-
 
     from primebit import PrimebitPrivate
     
@@ -246,9 +194,6 @@ Sell at market with a market order at current price
 
 Buy Limit for an order
 
-.. code:: python
-
-
     from primebit import PrimebitPrivate
     
     Key = ''
@@ -261,9 +206,6 @@ Buy Limit for an order
 
 
 Sell Limit for an order
-    
-.. code:: python
-
 
     from primebit import PrimebitPrivate
     
@@ -278,9 +220,6 @@ Sell Limit for an order
 
 
 Cancel current pending orders 
-    
-.. code:: python
-
 
     from primebit import PrimebitPrivate
     
@@ -295,9 +234,6 @@ Cancel current pending orders
 
 
 Listing all orders 
-    
-.. code:: python
-
 
     from primebit import PrimebitPrivate
     
