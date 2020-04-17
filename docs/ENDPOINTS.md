@@ -1,11 +1,11 @@
 PRIMEBIT ENDPOINTS 
 =================
 
-Assets
+Details on crypto currencies available on the exchange
 
     GET
     /trading/assets
-    Details on crypto currencies available on the exchange
+    
 
 
 Get symbols
@@ -23,7 +23,7 @@ Get symbol daily stats
 
 Get aggregated 32-levels of order book
 
-    GET
+    GETw
     /trading/market_data/order_book/{type}/{symbol}
 
 
@@ -32,7 +32,7 @@ Overview of market data for all tickers
 
     GET
     /trading/market_data/summary/{type}
-    Overview of market data for all tickers
+    
 
 24-hour rolling window price change statistics for all markets
 
@@ -95,5 +95,27 @@ Get account
 
     GET
     /trading/account/{id}
+    
+    
+Responses 
+
+    "responses": {
+          "504": {
+            "description": "temporary-server-error"
+          },
+          "429": {
+            "description": "orders-limit-reached"
+           },
+          "422": {
+            "description": "trade-disabled"
+          },
+          "404": {
+            "description": "not-found"
+          },
+          "200": {
+            "description": "ok"
+          }
+        },
+
 
 
