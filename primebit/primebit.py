@@ -9,8 +9,6 @@ from requests import \
 import hmac
 import time
 
-
-
 BASE_URL = 'https://app.primebit.com/api/v1'
 
 
@@ -26,13 +24,28 @@ class PrimebitPublic():
         r_url = self.base_url + api_url
         print(r_url)
         try:
-            r = request(method, r_url, params=params)
-            print(r)
-            r.raise_for_status()
+            data = request(method, r_url, params=params)
+            print(data)
+            data.raise_for_status()
         except exceptions.HTTPError as err:
             print(err)
-        if r.status_code == 200:
-            return r.json()
+        if data.status_code == 200:
+            return data.json()
+
+        elif data.status_code == 404:
+            return "not-found"
+
+
+        elif data.status_code == 422:
+            return "trade-disabled"
+
+
+        elif data.status_code == 429:
+            return "orders-limit-reached"
+
+
+        elif data.status_code == 504:
+            return "temporary-server-error"
 
     def _get(self, api_url: str, params: Optional[Dict[str, Any]] = None):
         return self._request('GET', api_url, params=params)
@@ -182,7 +195,7 @@ class PrimebitPrivate():
         # print(response)
         return self._process_response(response)
 
-    def _process_response(self, response: Response) -> Any:
+    def _process_response(self, response: Response):
         try:
             data = response.json()
 
@@ -191,7 +204,6 @@ class PrimebitPrivate():
             raise
 
         return data
-
 
     def _sign_request(self, request: Request):
         timestamp = int(time.time())
@@ -310,11 +322,12 @@ class PrimebitPrivate():
         }
         :return:
         '''
+
         return self._post(
             '/trading/account/%s/order' % (self._account_ID),
-            **params)
+            params)
 
-    def marketBuy(self, symbol: str, volume: str, comment: str, stopPrice: str):
+    def marketBuy(self, symbol: str, volume: str):
         '''
 
         :param symbol:
@@ -343,9 +356,9 @@ class PrimebitPrivate():
             side='buy',
             type='market',
             volume=str(volume),
-            fill_type="immediate-or-cancel",
-            comment=comment,
-            stop_price=str(stopPrice)
+            # fill_type="immediate-or-cancel",
+            # comment=comment,
+            # stop_price=str(stopPrice)
 
         )
 
@@ -383,7 +396,7 @@ class PrimebitPrivate():
             stop_price=str(stopPrice)
         )
 
-    def buyLimit(self, symbol: str, volume: str, price: str, comment: str, stopPrice: str):
+    def buyLimit(self, symbol: str, volume: str, price: str):
         '''
 
         :param symbol:
@@ -414,9 +427,9 @@ class PrimebitPrivate():
             type='limit',
             volume=str(volume),
             price=str(price),
-            fill_type="immediate-or-cancel",
-            comment=comment,
-            stop_price=str(stopPrice)
+            # fill_type="immediate-or-cancel",
+            # comment=comment,
+            # stop_price=str(stopPrice)
         )
 
     def sellLimit(self, symbol: str, volume: str, price: str, comment: str, stopPrice: str):
@@ -489,12 +502,5 @@ class PrimebitPrivate():
         ]
         '''
         return self._get(
-            'GET',
             '/trading/account/%s/order' % (self._account_ID)
         )
-
-
-
-
-
-
