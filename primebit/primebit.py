@@ -187,12 +187,12 @@ class PrimebitPrivate():
 
     def _request(self, method: str, path: str, **kwargs):
         request = Request(method, BASE_URL + path, **kwargs)
-        # print('---------------------------------')
-        # print(method, BASE_URL + path)
-
+        print('---------------------------------')
+        print(method, BASE_URL + path)
+        print('---------------------------------')
         self._sign_request(request)
         response = self._session.send(request.prepare())
-        # print(response)
+        print(response)
         return self._process_response(response)
 
     def _process_response(self, response: Response):
@@ -216,7 +216,7 @@ class PrimebitPrivate():
         request.headers['api-key'] = self._api_key
         request.headers['authorization'] = signature
         request.headers['timestamp'] = str(timestamp)
-        # print(request.headers)
+        print(request.headers)
 
     def getAllAccounts(self):
         '''
@@ -322,12 +322,12 @@ class PrimebitPrivate():
         }
         :return:
         '''
-
+        # print(params)
         return self._post(
             '/trading/account/%s/order' % (self._account_ID),
             params)
 
-    def marketBuy(self, symbol: str, volume: str):
+    def marketBuy(self, symbol: str, volume: str,  comment: str, stopPrice: str):
         '''
 
         :param symbol:
@@ -356,9 +356,9 @@ class PrimebitPrivate():
             side='buy',
             type='market',
             volume=str(volume),
-            # fill_type="immediate-or-cancel",
-            # comment=comment,
-            # stop_price=str(stopPrice)
+            fill_type="immediate-or-cancel",
+            comment=comment,
+            stop_price=str(stopPrice)
 
         )
 
@@ -396,7 +396,7 @@ class PrimebitPrivate():
             stop_price=str(stopPrice)
         )
 
-    def buyLimit(self, symbol: str, volume: str, price: str):
+    def buyLimit(self, symbol: str, volume: str, price: str, comment: str , stopPrice: str):
         '''
 
         :param symbol:
@@ -427,9 +427,9 @@ class PrimebitPrivate():
             type='limit',
             volume=str(volume),
             price=str(price),
-            # fill_type="immediate-or-cancel",
-            # comment=comment,
-            # stop_price=str(stopPrice)
+            fill_type="immediate-or-cancel",
+            comment=comment,
+            stop_price=str(stopPrice)
         )
 
     def sellLimit(self, symbol: str, volume: str, price: str, comment: str, stopPrice: str):

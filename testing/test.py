@@ -93,9 +93,9 @@ print(data)
 
 ''' Buy at market with a market order at current price '''
 
-private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
-data = private.marketBuy(symbol='BTCUSD', volume='0.001')
-print(data)
+# private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
+# data = private.marketBuy(symbol='BTCUSD', volume='0.001')
+# print(data)
 
 ''' Sell at market with a market order at current price '''
 
@@ -105,9 +105,9 @@ print(data)
 
 ''' Buy Limit for an order '''
 
-private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
-data = private.buyLimit(symbol='ETHUSD', volume='0.001', price='7000')
-print(data)
+# private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
+# data = private.buyLimit(symbol='ETHUSD', volume='0.001', price='7000')
+# print(data)
 
 ''' Sell Limit for an order'''
 
@@ -123,10 +123,16 @@ print(data)
 
 ''' Listing all orders'''
 
+Key = '6482d965-71e8-4d38-bec0-e2c72325835b'
+Secret = 'o60jcowlM19wHQsmHoIG9sAMbRYWPP5a53CfaW5VeBg='
+accountID = '510903ae-57ee-44b8-a1c8-a763d4eef930'
+# private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
 
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
-data = private.getAccountOrders()
+data = private.getAccount()
 print(data)
+
+
 
 
 private = PrimebitPrivate(accountID=accountID, key=Key, secret=Secret)
@@ -138,6 +144,6 @@ data = private.createOrder(
     side="buy",
     limit_price="7000.7",
     fill_type="immediate-or-cancel",
-    comment=""
+    comment="order#32787"
 )
 print(data)
