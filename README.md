@@ -1,5 +1,14 @@
 Account Endpoints
 =================
+This is un-official PrimeBit Wrapper for Python which is based on PrimeBit's API v1 which is  is currently stable. Base REST API endpoint is https://app.primebit.com/api/v1.
+
+In case of a challenge, please do open a ticket and I will try to work on it as soon as I can. 
+
+Account Endpoints
+=================
+
+
+
 
 Public Orders
 ------
